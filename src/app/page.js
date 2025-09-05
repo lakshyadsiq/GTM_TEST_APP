@@ -1,103 +1,138 @@
-import Image from "next/image";
+"use client"; // Add this line at the top for App Router
 
-export default function Home() {
-  return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              src/app/page.js
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+import React, { useState, useEffect } from 'react';
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
-  );
+// --- Configuration ---
+// ⬇️ 1. REPLACE 'GTM-XXXXXXX' WITH YOUR ACTUAL GTM CONTAINER ID ⬇️
+const GTM_ID = 'GTM-KD9SZZJ4';
+// ---------------------
+
+export default function GtmTestPage() {
+    const [formMessageVisible, setFormMessageVisible] = useState(false);
+
+    // This useEffect hook replaces the next/script component to inject the GTM script
+    // This approach is framework-agnostic and resolves the compilation error.
+    useEffect(() => {
+        const script = document.createElement('script');
+        script.id = 'gtm-script';
+        script.innerHTML = `
+            (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+            new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+            j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+            'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+            })(window,document,'script','dataLayer','${GTM_ID}');
+        `;
+        document.head.appendChild(script);
+
+        // Cleanup function to remove the script when the component unmounts
+        return () => {
+            const existingScript = document.getElementById('gtm-script');
+            if (existingScript) {
+                document.head.removeChild(existingScript);
+            }
+        };
+    }, []); // The empty dependency array ensures this runs only once when the component mounts
+
+    const handleFormSubmit = (event) => {
+        // Prevent the default form submission which reloads the page
+        event.preventDefault();
+
+        // Show the success message
+        setFormMessageVisible(true);
+
+        // This is the ideal place to push a custom event to the Data Layer for more reliable tracking
+        // For advanced users: You can create a "Custom Event" trigger in GTM that listens for 'form_submission_success'
+        window.dataLayer = window.dataLayer || [];
+        window.dataLayer.push({
+            'event': 'form_submission_success',
+            'formName': 'Contact Form Demo'
+        });
+
+        // Optional: Hide the message after a few seconds
+        setTimeout(() => {
+            setFormMessageVisible(false);
+        }, 5000);
+
+        // Reset the form fields
+        event.target.reset();
+    };
+
+    return (
+        <>
+            {/* The <noscript> part of the GTM tag is standard HTML and can be kept. */}
+            <noscript>
+                <iframe
+                    src={`https://www.googletagmanager.com/ns.html?id=${GTM_ID}`}
+                    height="0"
+                    width="0"
+                    style={{ display: 'none', visibility: 'hidden' }}
+                ></iframe>
+            </noscript>
+            
+            <div className="bg-slate-100 text-slate-800 font-sans">
+                <div className="container mx-auto max-w-4xl my-10 px-4">
+                    
+                    <header className="bg-white p-8 rounded-2xl shadow-lg border border-slate-200 mb-8">
+                        <h1 className="text-4xl font-bold text-slate-900 mb-2">GTM Testing Ground (Next.js)</h1>
+                        <p className="text-slate-600">This is a demo website to help you test your Google Tag Manager implementation. Use GTM's "Preview" mode to see your tags fire in real-time as you interact with the elements below.</p>
+                    </header>
+
+                    <main className="space-y-8">
+                        {/* SECTION: Page View & Config Tag Testing */}
+                        <div className="bg-white p-8 rounded-2xl shadow-lg border border-slate-200">
+                            <h2 className="text-2xl font-bold text-slate-900 mb-3">1. Page View Tracking</h2>
+                            <p>Simply by loading this page, your "All Pages" trigger should have fired. This is perfect for testing your base configuration tags like the <strong>Google Analytics 4 Config Tag</strong>, <strong>Meta Pixel Base Code</strong>, or the <strong>Google Ads Conversion Linker</strong>.</p>
+                        </div>
+
+                        {/* SECTION: Button Click Tracking */}
+                        <div className="bg-white p-8 rounded-2xl shadow-lg border border-slate-200">
+                            <h2 className="text-2xl font-bold text-slate-900 mb-3">2. Button Click Tracking</h2>
+                            <p className="mb-4">This is where you can test your `GA4 - Event - Contact Us Click` tag. Create a trigger in GTM that listens for a click on a button with the text "Contact Us".</p>
+                            <button id="contact-us-btn" className="bg-blue-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-blue-700 transition-all shadow-md">
+                                Contact Us
+                            </button>
+                        </div>
+
+                        {/* SECTION: Link Click Tracking */}
+                        <div className="bg-white p-8 rounded-2xl shadow-lg border border-slate-200">
+                            <h2 className="text-2xl font-bold text-slate-900 mb-3">3. Link Click Tracking</h2>
+                            <p className="mb-4">You can track different types of link clicks. For example, you can create a trigger to track clicks on all outbound links.</p>
+                            <ul className="list-disc list-inside space-y-2">
+                                <li><a href="#footer" className="text-blue-600 hover:underline">This is an internal link.</a></li>
+                                <li><a href="https://marketingplatform.google.com/about/tag-manager/" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">This is an outbound link to Google.</a></li>
+                            </ul>
+                        </div>
+
+                        {/* SECTION: Form Submission Tracking */}
+                        <div className="bg-white p-8 rounded-2xl shadow-lg border border-slate-200">
+                            <h2 className="text-2xl font-bold text-slate-900 mb-3">4. Form Submission Tracking</h2>
+                            <p className="mb-4">Tracking form submissions is a key conversion goal. You can trigger tags when this form is successfully submitted. The best practice is to use the custom 'form_submission_success' event we're pushing to the Data Layer.</p>
+                            <form id="contact-form" className="space-y-4" onSubmit={handleFormSubmit}>
+                                <div>
+                                    <label htmlFor="name" className="block text-sm font-medium text-slate-700">Name</label>
+                                    <input type="text" id="name" name="name" required className="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md shadow-sm placeholder-slate-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500" />
+                                </div>
+                                <div>
+                                    <label htmlFor="email" className="block text-sm font-medium text-slate-700">Email</label>
+                                    <input type="email" id="email" name="email" required className="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md shadow-sm placeholder-slate-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500" />
+                                </div>
+                                <button type="submit" className="w-full bg-green-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-green-700 transition-all shadow-md">Submit Form</button>
+                            </form>
+                            {formMessageVisible && (
+                                <div id="form-message" className="mt-4 p-4 text-center text-green-800 bg-green-100 rounded-lg">
+                                    Thank you! Your form has been submitted successfully.
+                                </div>
+                            )}
+                        </div>
+                    </main>
+
+                    <footer id="footer" className="text-center text-slate-500 mt-12 py-6 border-t border-slate-200">
+                        <p>&copy; 2025 GTM Testing Ground. Built for learning.</p>
+                    </footer>
+
+                </div>
+            </div>
+        </>
+    );
 }
+
