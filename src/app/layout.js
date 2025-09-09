@@ -1,5 +1,6 @@
 // app/layout.js
 import Script from 'next/script'; // Import the Script component
+import Navigation from '../components/Navigation';
 import './globals.css';
 
 const GTM_ID = process.env.NEXT_PUBLIC_GTM_ID;
@@ -41,7 +42,10 @@ export default function RootLayout({ children }) {
           gtag('config', 'G-6F9L57MDB5');
         `}
       </Script>
-      <body>{children}</body>
+      <body>
+        <Navigation />
+        {children}
+      </body>
     </html>
   );
 }
