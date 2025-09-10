@@ -1,13 +1,13 @@
 // app/layout.js
-import Script from 'next/script'; // Import the Script component
-import Navigation from '../components/Navigation';
-import './globals.css';
+import Script from "next/script"; // Import the Script component
+import Navigation from "../components/Navigation";
+import "./globals.css";
 
 const GTM_ID = process.env.NEXT_PUBLIC_GTM_ID;
 
 export const metadata = {
-  title: 'GTM Testing Ground',
-  description: 'A Next.js app to test GTM integration',
+  title: "GTM Testing Ground",
+  description: "A Next.js app to test GTM integration",
 };
 
 export default function RootLayout({ children }) {
@@ -19,7 +19,7 @@ export default function RootLayout({ children }) {
           src={`https://www.googletagmanager.com/ns.html?id=${GTM_ID}`}
           height="0"
           width="0"
-          style={{ display: 'none', visibility: 'hidden' }}
+          style={{ display: "none", visibility: "hidden" }}
         ></iframe>
       </noscript>
 
@@ -33,12 +33,18 @@ export default function RootLayout({ children }) {
         })(window,document,'script','dataLayer','${GTM_ID}');
         `}
       </Script>
-      <Script async src="https://www.googletagmanager.com/gtag/js?id=G-6F9L57MDB5" strategy="afterInteractive" />
+      <Script
+        async
+        src="https://www.googletagmanager.com/gtag/js?id=G-6F9L57MDB5"
+        strategy="afterInteractive"
+      />
       <Script id="gtag-init" strategy="afterInteractive">
-        {`          
+        {`
           window.dataLayer = window.dataLayer || [];
           function gtag(){dataLayer.push(arguments);}
           gtag('js', new Date());
+          // force debug mode on
+          gtag('set', 'debug_mode', true);
           gtag('config', 'G-6F9L57MDB5');
         `}
       </Script>
