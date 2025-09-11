@@ -4,6 +4,7 @@ import Navigation from "../components/Navigation";
 import "./globals.css";
 
 const GTM_ID = process.env.NEXT_PUBLIC_GTM_ID;
+const GA_ID = process.env.NEXT_PUBLIC_GA_ID;
 
 export const metadata = {
   title: "GTM Testing Ground",
@@ -35,7 +36,7 @@ export default function RootLayout({ children }) {
       </Script>
       <Script
         async
-        src="https://www.googletagmanager.com/gtag/js?id=G-6F9L57MDB5"
+        src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`}
         strategy="afterInteractive"
       />
       <Script id="gtag-init" strategy="afterInteractive">
@@ -45,7 +46,7 @@ export default function RootLayout({ children }) {
           gtag('js', new Date());
           // force debug mode on
           gtag('set', 'debug_mode', true);
-          gtag('config', 'G-6F9L57MDB5');
+          gtag('config', ${GA_ID});
         `}
       </Script>
       <body>
